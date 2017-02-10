@@ -1,0 +1,57 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+.top-buffer { margin-top:20px; }
+.med-buffer { margin-top:10px; }
+.med-lbuffer { margin-left:10px; }
+.sm-buffer { margin-top:5px; }
+.sm-bbuffer { margin-bottom:5px; }
+.green { color:#2eb82e; }
+.red { color: #cc0000; }
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.vcenterr {
+    display: inline-block;
+    vertical-align: bottom;
+    float: none;
+}
+
+.card-deck {
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap; 
+  align-items: stretch;
+  
+}
+.card-deck .card {
+  display: block;
+  margin-bottom:1em;
+  margin-right:1em;
+  width: 202px;
+}
+
+.thumb1 { 
+background: url(blah.jpg) 50% 50% no-repeat; /* 50% 50% centers image in div */
+width: 250px;
+height: 250px;
+}

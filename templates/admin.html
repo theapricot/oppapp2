@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block body %}
+<title>All Events - Media Services</title>
+
+
+<form id="adminForm" action="" method=post>
+   <div class="container">
+	   <table class="table">
+		<thead>
+			 <td>
+					<ul class="nav nav-pills">
+					  <li class="nav-item">
+					    <a class="nav-link active" href="#">Upcoming Events</a>
+					  </li>
+					  <li class="nav-item">
+					    <a class="nav-link" href="{{ url_for('past') }}">Past Events</a>
+					  </li>  
+					</ul>
+			
+				</td>
+				
+				<td>	     
+				<button type="button" class="btn btn-outline-secondary" onclick="toggleSignUps()">
+					<span id="signUpText" class="text-muted"> Please Wait...</span>
+				</button>
+				</td>
+				
+				<td style="text-align:right">
+				<a href="{{ url_for('new') }}" class="btn btn-success">
+					<i class="fa fa-plus" aria-hidden="true"></i> New Event
+					</a>
+				</td>
+				
+		</thead>
+		</table>
+		
+    <table class="table table-hover">
+        {% block events %}{% endblock %}
+    </table>
+    <!-- bottom buttons -->
+    </div>
+</form>
+    
+<script>
+	currentPage = "edit";
+	$(window).on('load', function(){ socket.emit("getSignUps") })
+	
+	function lockEvent(event) {
+		socket.emit("lockEvent", String(event));
+		document.getElementById("lock_"+event).innerHTML = "Please Wait...";
+	}
+	
+	function toggleSignUps() {
+		socket.emit("toggleSignUps");
+		document.getElementById("signUpText").innerHTML = "Please Wait...";
+	}
+	
+	socket.on('eventLock', function(data) {
+		if (data.locked) {
+				document.getElementById("lock_"+data.event).setAttribute("class", "btn btn-sm btn-danger");
+				document.getElementById("lock_"+data.event).innerHTML = "<i class=\"fa fa-lock\"> </i> Locked";
+			}
+		else {
+				document.getElementById("lock_"+data.event).setAttribute("class", "btn btn-sm btn-default");
+				document.getElementById("lock_"+data.event).innerHTML = "<i class=\"fa fa-unlock\"> </i> Unlocked";
+		}
+	});
+	
+	socket.on('signUpsAvailable', function(data) {
+		if (data.available) {
+				document.getElementById("signUpText").setAttribute("class", "text-success");
+				document.getElementById("signUpText").innerHTML = "<i id=\"signUpIcon\" class=\"fa fa-toggle-on\" aria-hidden=\"true\"></i> Sign-Ups Open";
+			}
+		else {
+				document.getElementById("signUpText").setAttribute("class", "text-danger");
+				document.getElementById("signUpText").innerHTML = "<i id=\"signUpIcon\" class=\"fa fa-toggle-off\" aria-hidden=\"true\"></i> Sign-Ups Closed";
+		}
+	});
+
+
+</script>
+{% endblock %}

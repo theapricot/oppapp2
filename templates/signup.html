@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% block body %}
+<div hidden id="jumbocontainer">
+<div id="jumbo">
+	 <div class="container rounded" style="background-color:#eee; padding:20px 20px 20px 20px; margin-bottom:20px">
+		<div class="row">
+			<div class="col-8">
+				<h4><i style="margin-right:5px" class="fa fa-map-marker" aria-hidden="true"></i><span id="location"></span></h4>
+			</div>
+				<div class="col-4">
+					<div class="btn-group" role="group" aria-label="Basic example">
+					<button id="interest" onclick="signUp(this)" type="button" class="btn btn-outline-success">Interested</button>
+					<button id="pref" onclick="preferred(this)" type="button" class="btn btn-outline-warning">Preferred</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div id="tags" class="col">
+				<h6><i class="fa fa-clock-o" style="margin-right:5px"></i><span id="time"></span></h6>
+				<h6 id="info" class="lead"></h6>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<div id="main" class="container">
+	<br><br>
+	<div id="deck">
+		<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading Events...
+	</div>
+</div>
+
+<script>
+	currentPage = "signup";
+	$(window).on('load', function(){ socket.emit("getEvents") })
+	var canSelect = 1;
+	var data = [];
+	var startEvent = 0;
+	var selectedEventID = null;
+	var lastElSelected = null;
+	function selectOnly(el,day,ev) {
+		if (canSelect) {
+			$("#" + lastElSelected).prop("class","row eventrow").css("background-color","#fff");
+			lastElSelected = el.id
+			$("#" + el.id).prop("class","row").css("background-color","#fff");;
+			$("#jumbo").appendTo("#" + el.id).removeAttr("hidden");;
+			var event = data[day].events[ev];
+			selectedEventID = event['id'];
+			$("a").filter(".nav-link").attr("class","nav-link");
+			$("#time").html(event['time'] + " - " + event['endtime']);
+			$("#info").html(event['info']);
+			$("#location").html(event['location']);
+			$(".badge").remove()
+			for (user in event['attendees']) {
+				$("<span class=\"badge badge-default\" style=\"font-size:15px; margin-right:5px;\">"+event['attendees'][user]+"</span>").appendTo("#tags");
+			}
+			$("#interest").prop("name",event['id']);
+			$("#pref").prop("name",event['id']);
+			switch (event.mystatus) {
+				case 0:
+					$("#interest").prop("class","btn btn-secondary");
+					$("#pref").prop("class","btn btn-secondary");
+					break;
+				case 1:
+					$("#interest").prop("class","btn btn-success");
+					$("#pref").prop("class","btn btn-secondary");
+					break;
+				case 2:
+					$("#interest").prop("class","btn btn-secondary");
+					$("#pref").prop("class","btn btn-warning");
+					break;
+				}
+			}
+		}
+	
+	function signUp(el) {
+		canSelect = 0;
+		$("#interest").html("Please wait...").prop("disabled",1);
+		$("#pref").prop("disabled",1);
+		toSend = {"opt":0,"ev":el.name,"lastel":lastElSelected};
+		socket.emit("signUp",toSend);
+		
+	}
+	
+	function preferred(el) {
+		canSelect = 0;
+		$("#pref").html("Please wait...").prop("disabled",1);
+		$("#interest").prop("disabled",1);
+		toSend = {"opt":1,"uid":{{ user.id }},"ev":el.name,"lastel":lastElSelected};
+		socket.emit("signUp",toSend);
+	}
+	
+	socket.on('sendEvents', function(sent) {
+		data = sent;
+		showEvents(data);
+		canSelect = 1;
+	});
+	
+	socket.on('refresh', function(lastel) {
+		$("#jumbo").appendTo("#"+lastel);
+	});
+	
+	function showEvents(data) {
+		$("#interest").html("Interested").removeAttr("disabled");
+		$("#pref").html("Preferred").removeAttr("disabled");
+		$("#jumbo").appendTo("#jumbocontainer");
+		$("#deck").html("");
+		for (day in data) {
+		
+		var template = 
+		"<h2><strong>"+data[day].weekday+"</strong>  "+data[day].date+"</h2>";
+		for (event in data[day].events) {
+			var eventObj = data[day].events[event];
+			var evColor = "text-muted";
+			var evColor2 = "";
+			switch (eventObj.mystatus) {
+				case 1:
+					evColor = "text-success";
+					evColor2 = "text-success";
+					break;
+				case 2:
+					evColor = "text-warning";
+					evColor2 = "text-warning";
+					break;
+			}
+			template +=	"<div class=\"row eventrow\" id=\"e"+day+event+"\" onclick=\"selectOnly(this,"+day+","+event+")\">" +
+			"<div class=\"col-2\"><h4 class=\""+evColor+"\">"+eventObj.time+"</h4></div>" +
+			"<div class=\"col-10\"><h4 class=\""+evColor2+"\">"+ eventObj.name +"</h4></div></div>";
+		} 
+		template += "<br><br>";
+			$(template).appendTo("#deck");
+		}
+	}
+	
+	$('#deck').on('mouseover','div.eventrow', function() {
+		var el = $(this);
+		if (canSelect) {
+			el.css("background-color","#eee");
+		}
+	})
+	$('#deck').on('mouseout','div.eventrow', function() {
+		var el = $(this);
+		if (canSelect) {
+			el.css("background-color","#fff");
+		}
+	})
+
+</script>
+{% endblock %}

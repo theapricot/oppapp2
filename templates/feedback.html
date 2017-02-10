@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block body %}
+    <!-- Past events -->
+<title>Feedback - Media Services</title>
+<div id="fbcontainer" class="container" style="text-align:center; margin-top:40px;">
+	<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading Events...
+</div>
+
+<script>
+	$(window).load(function(){ socket.emit("getFBNeeded") })
+	var data = [];
+	
+	currentPage = "pastevents";
+	socket.on('sendFBNeeded', function(sent) {
+		$("#fbcontainer").html("");
+		data = sent;
+		var msg = "You're caught up!";
+		if (data.length > 0) {
+			msg = "Please send feedback for:";
+		}
+		var template = "<h2>"+msg+"</h2>";
+		for (event in data) {
+			template += "<h4><a href=\"/feedback/"+data[event].id+"\">"+data[event].name+"</a></h4>"
+		}
+		$(template).appendTo("#fbcontainer");
+	});
+</script>
+{% endblock %}

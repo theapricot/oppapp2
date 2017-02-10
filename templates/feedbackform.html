@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Past events -->
+<title>Feeback - {{ event.name }}</title>
+<div class="container" style="margin-top:40px">
+	<div class="row" style="margin-bottom:20px">
+		<div class="col-md-12">
+			<h2>{{ event.name }}</h2>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="card">
+			<div class="card-block">
+				<form method=post>
+					<div class="form-group">
+						<label for="fbTime">Actual time worked:</label>
+						<input type="text" class="form-control" id="fbTime">
+					</div>
+					<div class="form-group">
+						<label for="fbRole">Your role:</label>
+						<textarea class="form-control" id="fbRole" rows="3"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="fbEquip">Equipment you used:</label>
+						<textarea class="form-control" id="fbEquip" rows="3"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="fbProblems">Problems and concerns:</label>
+						<textarea class="form-control" id="fbProblems" rows="3"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="fbThoughts">Thoughts for next time:</label>
+						<textarea class="form-control" id="fbThoughts" rows="3"></textarea>
+					</div>
+					<button class="btn btn-primary btn-block">Submit Feedback</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="card">
+			<div class="card-block">
+				<div id="actions" class="row" style="text-align:center">
+					<!-- The fileinput-button span is used to style the file input field as button -->
+					<span class="btn btn-secondary fileinput-button">
+					<strong><span>Upload photos of this event</span></strong>
+					</span><br>
+					<small class="text-muted">Selected images will upload automatically.</small>
+					<br>
+					<progress class="progress" id="globalProg" value="0" max="100" style="opacity:0"></progress>
+				</div>
+				<!-- The global file processing state -->
+				<div class="files" id="previews">
+					<div id="template" class="file-row">
+						<div class="col-md-6" style="margin-bottom:20px">
+							<img class="img-fluid img-rounded m-x-auto d-block" data-dz-thumbnail />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	// Get the template HTML and remove it from the doument
+	var previewNode = document.querySelector("#template");
+	previewNode.id = "";
+	var previewTemplate = previewNode.parentNode.innerHTML;
+	previewNode.parentNode.removeChild(previewNode);
+	
+	var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+	  url: "/upload", // Set the url
+	  thumbnailWidth: 200,
+	  thumbnailHeight: 200,
+	  parallelUploads: 20,
+	  previewTemplate: previewTemplate,
+	  autoQueue: true, // Make sure the files aren't queued until manually added
+	  previewsContainer: "#previews", // Define the container to display the previews
+	  clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+	});
+	
+	// Update the total progress bar
+	myDropzone.on("totaluploadprogress", function(progress) {
+	  $("#globalProg").prop("value",progress);
+	});
+	
+	myDropzone.on("sending", function(file) {
+	  // Show the total progress bar when upload starts
+	  $("#globalProg").prop("style","opacity:1;");
+	});
+	
+	// Hide the total progress bar when nothing's uploading anymore
+	myDropzone.on("queuecomplete", function(progress) {
+	  $("#globalProg").prop("style","opacity:0;");
+	});
+</script>
+{% endblock %}

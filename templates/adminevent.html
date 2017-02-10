@@ -1,0 +1,97 @@
+{% extends "admin.html" %}
+{% block events %}
+{% for event in eventiter %}
+{% set techsSignedUp = event.users|length + event.usersPreferred|length %}
+
+		<tr {% if event.get_timeline() == 1 %}class="warning"{% endif %}>
+			<td><b><a href="/events/{{ event.id }}">{{ event.name }}
+				<br></a></b>
+				{{ event.date.strftime('%a, %b %d, %Y') }} <strong> {{ event.get_shorttime(0) }} - {{ event.get_shorttime(1) }}</strong>
+				<br>
+				<small>{{ event.get_natural('d') }}</small>
+			</td>
+			
+			<td>
+				<b><span class="badge badge-{% if techsSignedUp == 0 %}danger{% elif techsSignedUp < event.techsneeded %}warning{% else %}success{% endif %}">
+					{{ techsSignedUp }} / {{ event.techsneeded }}
+				</span></b>
+
+					<button type="button" class="btn btn-link btn-xs" data-toggle="modal" data-target="#addto_{{ event.id }}">
+						<i class="fa fa-plus" aria-hidden="true"></i> Add Tech</button>
+				 
+				 <div class="modal fade" id="addto_{{ event.id }}" role="dialog">
+						 <div class="modal-dialog modal-sm">
+							 <div class="modal-content">
+							    <div class="modal-body" style="text-align: center;">
+									<div class="btn-group-vertical" style="margin:0 auto;">
+										{%- for user in allusers %}
+										{% if not user in event.users %}
+											<button class="btn btn-xs btn-link" style="font-size:18px" type="submit" name="addtoevent" value="{{ user.id }},{{ event.id }}" 
+											class="btn btn-link btn-sm">{{ user.fname }} {{ user.lname }} {{ user.formatYear() }}
+											</button>
+										{% endif %}
+										{%- endfor %}
+									</div>
+								</div>
+							 </div>
+						  </div>
+				     </div>
+				<a class="btn btn-link btn-xs" 
+				href="mailto:{{ g.user.email }}?{% if g.user.get_setting('bcc') %}b{% endif %}cc={%- for user in event.users + event.usersPreferred %}{{ user.email }},{%- endfor %}&subject={{ event.name }}">
+				<i class="fa fa-envelope-o" aria-hidden="true"></i>
+				Email Techs</a>
+				
+				<br>
+				
+				{%- for user in event.usersPreferred + event.users %}
+			
+					<!-- TECH NAME BUTTON -->
+					<button type="button" name="removefromevent" value="{{ user.id }},{{ event.id }}" 
+						class="btn btn-sm btn-{% if user in event.usersPreferred %}warning{% else %}default{% endif %} sm-buffer" 
+						data-toggle="modal" data-target="#expand_{{ event.id }}_{{ user.id }}">
+						{{ user.fname }} {{ user.lname }}
+					</button>
+						
+					<div class="modal fade" id="expand_{{ event.id }}_{{ user.id }}" role="dialog">
+						 <div class="modal-dialog">
+							 <div class="modal-content">
+							    <div class="modal-header" style="text-align: center;">
+						           <h4 class="modal-title">{{ user.fname }} {{ user.lname }}</h4>
+						        </div>
+							    <div class="modal-body" style="text-align: center;">
+									<button class="btn btn-xs btn-danger" style="font-size:18px" type="submit"
+										name="removefromevent" value="{{ user.id }},{{ event.id }}">
+										<i class="fa fa-times" aria-hidden="true"></i> Remove from this event</button>
+										<br><br>
+										<p style="font-size:18px">Move to:</p>
+									<div class="btn-group-vertical">
+										{%- for todo2 in events %}
+										{% if not todo2 == event and todo2.get_timeline() < 2 %}
+										<button class="btn btn-xs btn-link" style="font-size:18px" type="submit" name="movetoevent" 
+										value="{{ user.id }},{{ event.id }},{{ todo2.id }}">{{ todo2.name }}</button>
+										{% endif %}
+										{%- endfor %}
+									</div>
+								</div>
+							  </div>
+						  </div>
+				     </div>
+				
+				
+				{%- endfor %}
+
+				
+
+			</td>
+			<td>
+				{% if event.locked %}
+				<button type="button" class="btn btn-danger btn-sm" onclick="lockEvent({{ event.id }})" id="lock_{{ event.id }}">
+					<i class="fa fa-lock"> </i> Locked</button>
+				{% else %}
+				<button type="button" class="btn btn-default btn-sm" onclick="lockEvent({{ event.id }})" id="lock_{{ event.id }}">
+					<i class="fa fa-unlock"> </i> Unlocked</button>
+				{% endif %}
+			</td>
+		</tr>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "past.html" %}
+{% block pastevents %}
+{% for event in eventiter %}
+		<tr>
+			<td><b><a href="/events/{{ event.id }}">{{ event.name }}
+				<br></a></b>
+				{{ event.date.strftime('%a, %b %d, %Y') }} <strong> {{ event.get_shorttime(0) }} - {{ event.get_shorttime(1) }}</strong>
+				<br>
+				<small>{{ event.get_natural('d') }}</small>
+			</td>
+			
+			<td>
+				<a class="btn btn-link btn-xs" 
+				href="mailto:{{ g.user.email }}?{% if g.user.get_setting('bcc') %}b{% endif %}cc={%- for user in event.users + event.usersPreferred %}{{ user.email }},{%- endfor %}&subject={{ event.name }}">
+				<i class="fa fa-envelope-o" aria-hidden="true"></i>
+				Email Techs</a>
+				
+				<br>
+				{%- for user in event.usersPreferred + event.users %}
+					<!-- TECH NAME BUTTON -->
+					<span class="badge badge-default">
+						{{ user.fname }} {{ user.lname }}
+					</span>
+				{%- endfor %}
+			</td>
+			<td>
+			</td>
+		</tr>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block body %}
+<title>GCC Media Services</title>
+<div class="jumbotron">
+	<h1>Welcome{% if g.user.is_authenticated %}, {{ g.user.fname }}{% endif %}!</h1>
+	<p>{{ item.welcome_text }}</p>
+</div>
+{% endblock %}

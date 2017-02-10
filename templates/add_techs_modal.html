@@ -1,0 +1,32 @@
+{% extends "index_editor.html" %}
+{% block modal %}
+<div id="addto{{ todo.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add to "{{ todo.name }}"</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+        
+		{%- for user in allusers %}
+			{% if not user in todo.users %}
+				<button type="submit" name="addtoevent" value="{{ user.id }},{{ todo.id }}" class="btn btn-md btn-info sm-buffer">
+				{{ user.fname }} {{ user.lname }}
+				</button>
+			{% endif %}
+		
+		
+		{%- endfor %}</b>
+        
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

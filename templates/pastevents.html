@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% block body %}
+<div hidden id="jumbocontainer">
+<div hidden id="jumbo" class="jumbotron">
+		<div class="row">
+			<div class="col col-lg-8">
+				<h4><i style="margin-right:5px" class="fa fa-map-marker" aria-hidden="true"></i><span id="location"></span></h4>
+			</div>
+		</div>
+		<div class="row">
+			<div id="tags" class="col col-lg-12">
+				<h6><i class="fa fa-clock-o" style="margin-right:5px"></i><span id="time"></span></h6>
+				<h6 id="info" class="lead"></h6>
+			</div>
+		</div>
+</div>
+</div>
+
+<div id="main" class="container">
+	<br><br>
+	<div id="deck">
+		<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading Events...
+	</div>
+</div>
+
+<script>
+	currentPage = "past";
+	$(window).load(function(){ socket.emit("getPastEvents") })
+	var canSelect = 1;
+	var data = [];
+	var startEvent = 0;
+	var selectedEventID = null;
+	var lastElSelected = null;
+	function selectOnly(el,day,ev) {
+		if (canSelect) {
+			$("#" + lastElSelected).prop("class","row eventrow").prop("style","background-color:#fff");
+			lastElSelected = el.id
+			$("#" + el.id).prop("class","row").prop("style","background-color:#fff");;
+			$("#jumbo").appendTo("#" + el.id).removeAttr("hidden");;
+			var event = data[day].events[ev];
+			selectedEventID = event['id'];
+			$("a").filter(".nav-link").attr("class","nav-link");
+			$("#time").html(event['time'] + " - " + event['endtime']);
+			$("#info").html(event['info']);
+			$("#location").html(event['location']);
+			$(".tag").remove()
+			for (user in event['attendees']) {
+				$("<span class=\"tag tag-default\" style=\"font-size:15px; margin-right:5px;\">"+event['attendees'][user]+"</span>").appendTo("#tags");
+			}
+			$("#interest").prop("name",event['id']);
+			$("#pref").prop("name",event['id']);
+			switch (event.mystatus) {
+				case 0:
+					$("#interest").prop("class","btn btn-secondary");
+					$("#pref").prop("class","btn btn-secondary");
+					break;
+				case 1:
+					$("#interest").prop("class","btn btn-success");
+					$("#pref").prop("class","btn btn-secondary");
+					break;
+				case 2:
+					$("#interest").prop("class","btn btn-secondary");
+					$("#pref").prop("class","btn btn-warning");
+					break;
+				}
+			}
+		}
+
+	
+
+	
+	socket.on('sendPastEvents', function(sent) {
+		data = sent;
+		showEvents(data);
+		canSelect = 1;
+	});
+	
+	socket.on('refresh', function(lastel) {
+		$("#jumbo").appendTo("#"+lastel);
+	});
+	
+	function showEvents(data) {
+		$("#interest").html("Interested").removeAttr("disabled");
+		$("#pref").html("Preferred").removeAttr("disabled");
+		$("#jumbo").appendTo("#jumbocontainer");
+		$("#deck").html("");
+		for (day in data) {
+		
+		var template = 
+		"<h2><strong>"+data[day].weekday+"</strong>  "+data[day].date+"</h2>";
+		for (event in data[day].events) {
+			var eventObj = data[day].events[event];
+			template +=	"<div class=\"row eventrow\" id=\"e"+day+event+"\" onclick=\"selectOnly(this,"+day+","+event+")\">" +
+			"<div class=\"col-sm-2\"><h4 class=\"text-primary\">"+eventObj.time+"</h4></div>" +
+			"<div class=\"col-sm-10\"><h4 class=\"text-primary\">"+ eventObj.name +"</h4></div></div>";
+		} 
+		template += "<br><br>";
+			$(template).appendTo("#deck");
+		}
+	}
+	
+	$('#deck').on('mouseover','div.eventrow', function() {
+		var el = $(this);
+		if (canSelect) {
+			el.prop("style","background-color:#eee");
+		}
+	})
+	$('#deck').on('mouseout','div.eventrow', function() {
+		var el = $(this);
+		if (canSelect) {
+			el.prop("style","background-color:#fff");
+		}
+	})
+
+</script>
+{% endblock %}
