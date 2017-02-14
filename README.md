@@ -1,13 +1,18 @@
 # oppapp
-Web app for managing Grove City College Media Services' student tech work opportunities.
+Web app for managing Grove City College Media Services' student tech work opportunities. Requires Python 3.
 
-Requires Python 3
+`$ apt-get install python3 python-pip`
 
-1. Install dependencies:
+- Using a virtual environment is recommended:
+`$ pip install virtualenv
+$ virtualenv -p python3 venv
+$ source venv/bin/activate`
+
+- Install dependencies:
 `$ pip install -r requirements.txt`
 
-2. Run configure-db to create the database:
+- Create the database:
 `$ python configure-db.py`
 
-3. Run the app:
-`$ python oppapp.py`
+- Run the app:
+`$ python app.py`
