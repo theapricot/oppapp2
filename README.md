@@ -3,9 +3,13 @@ Web app for managing Grove City College Media Services' student tech work opport
 
 `$ apt-get install python3 python-pip`
 
-- Using a virtual environment is recommended:
+- Using a virtual environment is recommended: 
+`$ pip install virtualenv`
+
+- Clone source, create virtual environment:
 ```
-$ pip install virtualenv
+$ git clone https://github.com/theapricot/oppapp2.git
+$ cd oppapp2
 $ virtualenv -p python3 venv
 $ source venv/bin/activate
 ```
