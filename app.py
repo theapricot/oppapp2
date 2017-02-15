@@ -351,5 +351,5 @@ def before_request():
 # RUN APP #
 if __name__ == '__main__':
     print("Starting...")
-    sio.run(app, host="0.0.0.0", port=8080)
+    sio.run(app, host="0.0.0.0", port=5000)
 
