@@ -97,7 +97,7 @@ def admin():
     
     def renderAdmin():
         for event in events:
-            time.sleep(.01)
+            #time.sleep(.01)
             yield event
     g.user = current_user
     return Response(stream_with_context(stream_template('adminevent.html', eventiter = renderAdmin(), events=events, allusers=allusers)))
@@ -115,7 +115,7 @@ def past():
     
     def render_past():
         for event in events:
-            time.sleep(.01)
+            #time.sleep(.01)
             yield event
     g.user = current_user
     return Response(stream_with_context(stream_template('past_event.html', eventiter = render_past(), events=events, allusers=allusers)))
