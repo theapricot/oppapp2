@@ -175,6 +175,9 @@ class Opps(db.Model):
         self.deleted = False
         self.locked = 0
         
+    def __repr__(self):
+        return '<Event \'{}\'>'.format(self.name)
+        
     def get_timeline(self):
         # returns a number based on how now is related to when the event is
         now = datetime.now()
@@ -218,6 +221,10 @@ class Opps(db.Model):
 class Feedback(db.Model):
     def __init__(self, data):
         self.data = data
+        
+    def __repr__(self):
+        return '<Feedback for {} by {}>'.format(self.event, self.user)
+        
     id = db.Column(db.Integer, primary_key = True)
     data = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
