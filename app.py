@@ -200,20 +200,6 @@ def show_or_update(eventID):
     flash('You are not authorized to edit this todo item','danger')
     return redirect(url_for('show_or_update',todo_id=todo_id))
     
-# CLEAR PAST EVENTS METHOD #
-@app.route('/clear')
-def clear():
-    if not g.user.is_editor() and not g.user.is_webadmin():
-        flash(mustBeStudentCoord[0],mustBeStudentCoord[1])
-        return redirect(url_for('index'))
-        
-    opps = Opps.query.all()
-    for opp in opps:
-        if opp.get_timeline() == 2:
-            opp.deleted = True
-    db.session.commit()
-    flash('Cleared Past Events.','info')
-    return redirect(url_for('index'))
     
 @app.route('/signup')
 @login_required
@@ -226,14 +212,21 @@ def signup():
 @app.route('/feedback')
 @login_required
 def feedback():
-    return render_template('feedback.html')
+    fbNeededFor = db.session.query(Opps).filter(Opps.users.any(Users.id == current_user.id) | Opps.usersPreferred.any(Users.id == current_user.id)).filter(~Opps.feedback.any(Feedback.user == current_user)).filter(Opps.deleted == False).all()
+    return render_template('feedback.html', fbNeededFor = fbNeededFor)
     
 @app.route('/feedback/<int:eventID>', methods = ['GET' , 'POST'])
 @login_required
 def feedbackFor(eventID):
-	if request.method == 'GET':
-		return render_template('feedbackform.html', event = Opps.query.get(int(eventID)))
-	return redirect(url_for('feedback'))
+    event = Opps.query.get(int(eventID))
+    if request.method == 'GET':
+        return render_template('feedbackform.html', event = event)
+    data = {'timeWorked':request.form['fbTime']}
+    fb = Feedback(data)
+    fb.event = event
+    fb.user = current_user
+    db.session.commit()
+    return redirect(url_for('feedback'))
     
 @app.route('/upload', methods = ['POST'])
 def upload():

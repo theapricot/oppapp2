@@ -2,12 +2,13 @@
 {% block body %}
     <!-- Past events -->
 <title>Feedback - Media Services</title>
-<div id="fbcontainer" class="container" style="text-align:center; margin-top:40px;">
-	<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading Events...
-</div>
+
+{% for event in fbNeededFor %}
+<p><a href="/feedback/{{ event.id }}">{{ event.name }}</a></p>
+{% endfor %}
 
 <script>
-	$(window).load(function(){ socket.emit("getFBNeeded") })
+	//$(window).load(function(){ socket.emit("getFBNeeded") })
 	var data = [];
 	
 	currentPage = "pastevents";
