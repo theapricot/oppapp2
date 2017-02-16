@@ -221,11 +221,12 @@ def feedbackFor(eventID):
     event = Opps.query.get(int(eventID))
     if request.method == 'GET':
         return render_template('feedbackform.html', event = event)
-    data = {'timeWorked':request.form['fbTime']}
-    fb = Feedback(data)
+
+    fb = Feedback(json.dumps(request.form.to_dict()))
     fb.event = event
     fb.user = current_user
     db.session.commit()
+    flash("Thanks for your feedback!","success")
     return redirect(url_for('feedback'))
     
 @app.route('/upload', methods = ['POST'])
@@ -344,5 +345,5 @@ def before_request():
 # RUN APP #
 if __name__ == '__main__':
     print("Starting...")
-    sio.run(app, host="0.0.0.0", port=5000)
+    sio.run(app, debug=True, host="0.0.0.0", port=5000)
 
