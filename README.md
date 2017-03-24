@@ -1,6 +1,22 @@
 # oppapp
-Web app for managing Grove City College Media Services' student tech work opportunities. Requires Python 3.
+Web app for managing Grove City College Media Services' student technician work opportunities. Requires Python 3.
 
+**Signing up for an event:**
+
+![signup](https://cloud.githubusercontent.com/assets/19446736/24306521/455e3a3c-1097-11e7-9214-8accbec515ed.png)
+
+
+**Events assigned to a tech:**
+
+![myevents](https://cloud.githubusercontent.com/assets/19446736/24306258/6485da88-1096-11e7-8859-ae3bde1913e8.png)
+
+
+**What the tech coordinator sees:**
+
+![manage](https://cloud.githubusercontent.com/assets/19446736/24306250/58cf70fa-1096-11e7-845d-2f287263fea2.png)
+
+
+## Installation
 `$ apt-get install python3 python-pip`
 
 - Using a virtual environment is recommended: 
